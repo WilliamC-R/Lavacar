@@ -118,10 +118,22 @@ a {
   gap: 4rem;
 }
 
+.page--compact {
+  padding-top: 2.5rem;
+  gap: 3rem;
+}
+
 .hero {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2.5rem;
+  align-items: stretch;
+}
+
+.access__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
   align-items: stretch;
 }
 

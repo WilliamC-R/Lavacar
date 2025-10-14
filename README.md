@@ -2,7 +2,7 @@
 
 Experiência web estática inspirada em dashboard premium para gestão de lavação com dois acessos dedicados.
 
-- **Portal do cliente (`cliente.html`)**: destaque comercial, consulta de horários, planos recorrentes, formulário completo de agendamento, lista de pagamentos e painel de dicas.
+- **Portal do cliente (`cliente.html`)**: autenticação por CPF, consulta de planos ativos e histórico de compras em um layout dedicado.
 - **Painel da equipe (`equipe.html`)**: visão operacional diária com métricas, tarefas em tempo real, confirmações de pagamento, estoque e comunicados internos.
 
 ## Como visualizar
