@@ -92,6 +92,10 @@ a {
   border-color: rgba(73, 163, 255, 0.35);
 }
 
+.is-muted {
+  color: var(--text-muted);
+}
+
 .cta {
   display: inline-flex;
   align-items: center;
@@ -600,19 +604,23 @@ a {
   pointer-events: none;
 }
 
-.form-field {
+.form-field,
+.form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.form-field label {
+.form-field label,
+.form-group label {
   font-weight: 600;
   color: var(--text-muted);
 }
 
 .form-field input,
-.form-field select {
+.form-field select,
+.form-group input,
+.form-group select {
   border-radius: var(--radius-sm);
   border: 1px solid rgba(73, 163, 255, 0.2);
   padding: 0.75rem 0.9rem;
@@ -620,14 +628,201 @@ a {
   color: var(--text);
 }
 
-.form-field input::placeholder {
+.form-field input::placeholder,
+.form-group input::placeholder {
   color: rgba(245, 248, 255, 0.4);
 }
 
-.form-grid {
+.form-grid,
+.form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
+}
+
+.form-row {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.form-helper {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.quick-booking__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.quick-booking__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quick-booking__details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: linear-gradient(145deg, rgba(73, 163, 255, 0.12), rgba(17, 24, 45, 0.9));
+}
+
+.quick-booking__details p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.details__cta {
+  margin-top: auto;
+}
+
+.details__cta .btn-secondary {
+  width: fit-content;
+}
+
+.time-slots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.75rem;
+}
+
+.time-slots li {
+  margin: 0;
+}
+
+.slot {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(73, 163, 255, 0.25);
+  padding: 0.85rem 0.75rem;
+  background: rgba(10, 15, 28, 0.65);
+  color: var(--text);
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.slot:hover,
+.slot:focus-visible {
+  transform: translateY(-2px);
+}
+
+.slot:disabled {
+  cursor: not-allowed;
+  transform: none;
+}
+
+.slot--available:hover,
+.slot--available:focus-visible {
+  border-color: rgba(73, 163, 255, 0.6);
+}
+
+.slot--booked {
+  background: rgba(248, 113, 113, 0.18);
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #fca5a5;
+}
+
+.slot--selected {
+  background: rgba(250, 204, 21, 0.2);
+  border-color: rgba(250, 204, 21, 0.6);
+  color: #fde68a;
+}
+
+.legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.plan-card header h3 {
+  margin: 0.4rem 0 0;
+}
+
+.plan-card__benefits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.plan-card__benefits li {
+  position: relative;
+  padding-left: 1.3rem;
+  color: var(--text-muted);
+}
+
+.plan-card__benefits li::before {
+  content: "•";
+  position: absolute;
+  left: 0.2rem;
+  color: var(--accent);
+}
+
+.plan-card__trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(73, 163, 255, 0.12);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.tips-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.tips-card li {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(8, 12, 25, 0.5);
+  border: 1px solid rgba(73, 163, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.portal__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  align-items: start;
 }
 
 .booking-list {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lavacar • Escolha sua área</title>
+    <title>Lavacar • Agendamento e planos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,7 +16,7 @@
     <header class="top-bar">
       <div class="brand">
         <span class="brand__logo">Lavacar</span>
-        <span class="brand__subtitle">Experiência completa em estética automotiva</span>
+        <span class="brand__subtitle">Cuidamos do seu veículo com precisão</span>
       </div>
       <nav class="top-bar__nav">
         <a class="nav-link" href="autenticacao.html">Área do cliente</a>
@@ -25,30 +25,86 @@
     </header>
 
     <main class="page page--landing">
-      <section class="hero">
-        <header class="hero__content">
-          <span class="hero__label">Bem-vindo</span>
-          <h1>Selecione a área que deseja acessar</h1>
+      <section class="section quick-booking" id="agendamento">
+        <header class="section__header">
+          <span class="section__label">Agendamento rápido</span>
+          <h1>Reserve seu horário com CPF e placa</h1>
           <p>
-            Clientes podem autenticar com CPF e senha de 4 dígitos para acompanhar planos e
-            histórico. A equipe encontra aqui controles de operações e estoque.
+            Informe os dados essenciais e escolha o tipo de lavagem para garantir um horário em
+            menos de um minuto.
           </p>
-          <div class="hero__actions">
-            <a class="btn-primary" href="autenticacao.html">Entrar na área do cliente</a>
-            <a class="btn-secondary" href="equipe.html">Ir para a equipe</a>
-          </div>
         </header>
-        <div class="hero__cards">
-          <article class="card hero-card">
-            <span class="card__label">Cliente</span>
-            <h2>Agendamentos e planos</h2>
-            <p>Consulte assinaturas, pagamentos confirmados e histórico de serviços.</p>
-          </article>
-          <article class="card hero-card">
-            <span class="card__label">Equipe</span>
-            <h2>Operações do dia</h2>
-            <p>Organize tarefas, confirme pagamentos e acompanhe o estoque.</p>
-          </article>
+        <div class="quick-booking__grid">
+          <form class="card quick-booking__form" id="quickBookingForm" novalidate>
+            <div class="form-group">
+              <label for="bookingCpf">CPF</label>
+              <input type="text" id="bookingCpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
+            </div>
+            <div class="form-group">
+              <label for="bookingName">Nome completo</label>
+              <input type="text" id="bookingName" name="name" placeholder="Nome do cliente" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bookingPlate">Placa</label>
+                <input type="text" id="bookingPlate" name="plate" maxlength="8" placeholder="AAA0A00" required />
+              </div>
+              <div class="form-group">
+                <label for="bookingService">Tipo de lavagem</label>
+                <select id="bookingService" name="service" required>
+                  <option value="">Selecione</option>
+                </select>
+              </div>
+            </div>
+            <p class="form-helper">Selecione o horário disponível ao lado para concluir o agendamento.</p>
+            <button type="submit" class="btn-primary">Confirmar agendamento</button>
+          </form>
+
+          <aside class="card quick-booking__details">
+            <header>
+              <span class="card__label">Status do agendamento</span>
+              <h2>Escolha um horário disponível</h2>
+            </header>
+            <p id="selectedSlotInfo">Nenhum horário selecionado.</p>
+            <ul class="legend">
+              <li><span class="badge badge--available"></span> Disponível</li>
+              <li><span class="badge badge--danger"></span> Indisponível</li>
+              <li><span class="badge badge--pending"></span> Selecionado</li>
+            </ul>
+            <div class="details__cta">
+              <a class="btn-secondary" href="autenticacao.html">Acompanhar histórico</a>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section slots" id="horarios">
+        <header class="section__header">
+          <span class="section__label">Horários disponíveis</span>
+          <h2>Funcionamento das 08h às 21h</h2>
+          <p>Clique para selecionar um horário verde. Vermelho indica indisponibilidade.</p>
+        </header>
+        <div class="card slots-card">
+          <ul class="time-slots" id="timeSlotsList"></ul>
+        </div>
+      </section>
+
+      <section class="section plans" id="planos">
+        <header class="section__header">
+          <span class="section__label">Planos</span>
+          <h2>Assinaturas para manter o carro impecável</h2>
+          <p>Escolha o pacote que mais combina com a rotina do seu veículo.</p>
+        </header>
+        <div class="plan-grid" id="planCards"></div>
+      </section>
+
+      <section class="section tips" id="dicas">
+        <header class="section__header">
+          <span class="section__label">Dicas</span>
+          <h2>Cuidados rápidos para potencializar cada lavagem</h2>
+        </header>
+        <div class="card tips-card">
+          <ul id="tipsList"></ul>
         </div>
       </section>
     </main>
@@ -67,5 +123,8 @@
         <p>Contato via WhatsApp (48) 99999-0000</p>
       </div>
     </footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js" defer></script>
   </body>
 </html>

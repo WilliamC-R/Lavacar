@@ -26,36 +26,20 @@
     </header>
 
     <main class="page">
-      <section class="section" id="resumo-equipe">
+      <section class="section" id="agendamentos-equipe">
         <header class="section__header">
-          <span class="section__label">Painel do dia</span>
-          <h1>Serviços e indicadores em acompanhamento</h1>
-        </header>
-        <div class="metrics" id="teamMetrics"></div>
-      </section>
-
-      <section class="section" id="tarefas">
-        <header class="section__header">
-          <span class="section__label">Serviços a realizar</span>
-          <h2>Organize a execução com prioridade e status</h2>
-        </header>
-        <div class="card">
-          <ul class="tasks" id="tasksList"></ul>
-        </div>
-      </section>
-
-      <section class="section" id="pagamentos-equipe">
-        <header class="section__header">
-          <span class="section__label">Pagamentos</span>
-          <h2>Confirme recebimentos e libere a equipe</h2>
+          <span class="section__label">Painel de agendamentos</span>
+          <h1>Horários confirmados e andamento dos serviços</h1>
         </header>
         <div class="card table-card">
-          <table id="teamPayments">
+          <table id="teamAppointments">
             <thead>
               <tr>
+                <th>Data</th>
+                <th>Horário</th>
                 <th>Cliente</th>
                 <th>Serviço</th>
-                <th>Valor</th>
+                <th>Placa</th>
                 <th>Status</th>
                 <th></th>
               </tr>
@@ -63,6 +47,14 @@
             <tbody></tbody>
           </table>
         </div>
+      </section>
+
+      <section class="section" id="recados-equipe">
+        <header class="section__header">
+          <span class="section__label">Recados</span>
+          <h2>Atualizações rápidas para todo o time</h2>
+        </header>
+        <div class="card bulletin" id="teamNotes"></div>
       </section>
 
       <section class="section" id="estoque">
@@ -85,12 +77,25 @@
         </div>
       </section>
 
-      <section class="section" id="expedientes">
+      <section class="section" id="financas">
         <header class="section__header">
-          <span class="section__label">Comunicações rápidas</span>
-          <h2>Atualizações para toda a equipe</h2>
+          <span class="section__label">Finanças</span>
+          <h2>Confirme recebimentos e organize o caixa</h2>
         </header>
-        <div class="card bulletin" id="teamNotes"></div>
+        <div class="card table-card">
+          <table id="teamPayments">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </section>
     </main>
 

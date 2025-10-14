@@ -2,10 +2,10 @@
 
 Experiência web estática inspirada em dashboard premium para gestão de lavação com fluxos separados para clientes e equipe.
 
-- **Página inicial (`index.html`)**: escolha rápida entre área do cliente e painel da equipe.
+- **Página inicial (`index.html`)**: agendamento rápido com CPF, placa e tipo de lavagem, grade de horários disponíveis das 8h às 21h, vitrines de planos e dicas de cuidado.
 - **Autenticação do cliente (`autenticacao.html`)**: login por CPF e senha numérica de 4 dígitos, além de cadastro rápido com envio automático da senha.
-- **Portal do cliente (`cliente.html`)**: consulta de planos ativos e histórico de compras após autenticação concluída.
-- **Painel da equipe (`equipe.html`)**: visão operacional diária com métricas, tarefas em tempo real, confirmações de pagamento, estoque e comunicados internos.
+- **Portal do cliente (`cliente.html`)**: consulta de planos ativos e histórico de agendamentos após autenticação concluída.
+- **Painel da equipe (`equipe.html`)**: painel de agendamentos reais, recados, controle de estoque e consolidação financeira.
 
 ## Como visualizar
 

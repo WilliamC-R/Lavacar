@@ -19,8 +19,7 @@
         <span class="brand__subtitle">Acompanhe seus planos e cobranças</span>
       </div>
       <nav class="top-bar__nav">
-        <a class="nav-link is-active" href="#planos">Planos ativos</a>
-        <a class="nav-link" href="#historico">Histórico de compras</a>
+        <a class="nav-link" href="index.html">Agendamento rápido</a>
         <a class="nav-link" href="autenticacao.html">Autenticação</a>
         <a class="nav-link" href="equipe.html">Área da equipe</a>
       </nav>
@@ -65,8 +64,8 @@
                 <dd id="profilePlans">0</dd>
               </div>
               <div>
-                <dt>Última compra</dt>
-                <dd id="profileLastPayment">—</dd>
+                <dt>Último agendamento</dt>
+                <dd id="profileLastBooking">—</dd>
               </div>
             </dl>
             <button type="button" class="btn-secondary" id="logoutButton">Sair</button>
@@ -74,39 +73,38 @@
         </div>
       </section>
 
-      <section class="section plans" id="planos">
+      <section class="section portal" id="painel-cliente">
         <header class="section__header">
-          <span class="section__label">Planos ativos</span>
-          <h2>Mantenha suas assinaturas sob controle</h2>
-          <p>Aqui você encontra status, valores e próximas renovações.</p>
+          <span class="section__label">Painel pessoal</span>
+          <h2>Planos ativos e histórico de agendamentos</h2>
+          <p>Tudo em um único lugar após autenticação com CPF e senha de 4 dígitos.</p>
         </header>
-        <article class="card active-plans-card" id="activePlansCard">
-          <header>
-            <span class="card__label">Assinaturas</span>
-            <h3>Seus planos vigentes</h3>
-          </header>
-          <ul id="activePlansList" class="active-plans"></ul>
-        </article>
-      </section>
+        <div class="portal__grid">
+          <article class="card active-plans-card" id="activePlansCard">
+            <header>
+              <span class="card__label">Assinaturas</span>
+              <h3>Planos vigentes</h3>
+            </header>
+            <ul id="activePlansList" class="active-plans"></ul>
+          </article>
 
-      <section class="section history" id="historico">
-        <header class="section__header">
-          <span class="section__label">Histórico de compras</span>
-          <h2>Acompanhe seus pagamentos</h2>
-          <p>Veja cobranças recentes e confirme o status de cada serviço.</p>
-        </header>
-        <div class="card table-card" id="historyCard">
-          <table id="customerPayments">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Serviço</th>
-                <th>Valor</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <article class="card table-card" id="bookingsCard">
+            <header>
+              <span class="card__label">Histórico</span>
+              <h3>Agendamentos confirmados</h3>
+            </header>
+            <table id="customerBookings">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Horário</th>
+                  <th>Serviço</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </article>
         </div>
       </section>
     </main>
