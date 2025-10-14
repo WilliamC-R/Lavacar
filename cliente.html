@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lavacar • Portal do Cliente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="cliente">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand__logo">Lavacar</span>
+        <span class="brand__subtitle">Acompanhe seus cuidados automotivos em um só lugar</span>
+      </div>
+      <nav class="top-bar__nav">
+        <a class="nav-link is-active" href="#agendamentos">Agendamentos</a>
+        <a class="nav-link" href="#historico">Histórico de compras</a>
+        <a class="nav-link" href="#planos">Planos ativos</a>
+        <a class="nav-link" href="equipe.html">Área da equipe</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div class="hero__content">
+          <p class="hero__badge">Experiência 360º em cuidados automotivos</p>
+          <h1>Seu carro merece uma lavação premium</h1>
+          <p>
+            Escolha o melhor horário, acompanhe pagamentos e aproveite planos que
+            mantêm o veículo sempre em dia. Tudo em um ambiente rápido e seguro.
+          </p>
+          <div class="hero__highlights">
+            <div>
+              <strong>+3.500</strong>
+              <span>veículos revitalizados</span>
+            </div>
+            <div>
+              <strong>97%</strong>
+              <span>clientes recorrentes</span>
+            </div>
+            <div>
+              <strong>24h</strong>
+              <span>agendamento garantido</span>
+            </div>
+          </div>
+        </div>
+        <aside class="hero__panel">
+          <article class="card login-card" id="loginCard">
+            <header>
+              <span class="card__label">Acesso do cliente</span>
+              <h2>Entre com CPF e senha</h2>
+            </header>
+            <form id="loginForm" class="login-form">
+              <div class="form-field">
+                <label for="loginCpf">CPF</label>
+                <input id="loginCpf" name="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" required />
+              </div>
+              <div class="form-field">
+                <label for="loginPassword">Senha (3 dígitos)</label>
+                <input
+                  id="loginPassword"
+                  name="password"
+                  type="password"
+                  inputmode="numeric"
+                  pattern="[0-9]{3}"
+                  maxlength="3"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-primary">Acessar conta</button>
+            </form>
+            <p class="login-help">O acesso é exclusivo para clientes cadastrados na recepção.</p>
+          </article>
+          <article class="card profile-card" id="profileCard" hidden>
+            <header>
+              <span class="card__label">Cliente autenticado</span>
+              <h2 id="profileName"></h2>
+            </header>
+            <dl class="profile-card__info">
+              <div>
+                <dt>CPF</dt>
+                <dd id="profileCpf"></dd>
+              </div>
+              <div>
+                <dt>Próximo serviço</dt>
+                <dd id="profileNextBooking">Sem agendamentos</dd>
+              </div>
+              <div>
+                <dt>Planos ativos</dt>
+                <dd id="profilePlans">0</dd>
+              </div>
+            </dl>
+            <button type="button" class="btn-secondary" id="logoutButton">Sair</button>
+          </article>
+          <article class="card schedule-card">
+            <header>
+              <span class="card__label">Horários disponíveis</span>
+              <h2>Reserve em segundos</h2>
+            </header>
+            <ul class="availability" id="availabilityList"></ul>
+            <a href="#agendamentos" class="btn-primary">Fazer agendamento</a>
+          </article>
+          <article class="card metric-card">
+            <div>
+              <span class="metric-card__label">Planos ativos</span>
+              <strong id="activePlans">0</strong>
+            </div>
+            <div>
+              <span class="metric-card__label">Agendamentos hoje</span>
+              <strong id="todayBookings">0</strong>
+            </div>
+          </article>
+        </aside>
+      </section>
+
+      <section class="section services" id="servicos">
+        <header class="section__header">
+          <span class="section__label">Nossos serviços</span>
+          <h2>Escolha o cuidado ideal para o seu veículo</h2>
+        </header>
+        <div class="services__grid" id="servicesGrid"></div>
+      </section>
+
+      <section class="section booking" id="agendamentos">
+        <header class="section__header">
+          <span class="section__label">Agendamentos</span>
+          <h2>Escolha o melhor dia e horário para você</h2>
+        </header>
+        <div class="booking__layout">
+          <form class="card booking__form" id="bookingForm">
+            <div class="form-field">
+              <label for="bookingName">Nome completo</label>
+              <input id="bookingName" name="name" type="text" required />
+            </div>
+            <div class="form-field">
+              <label for="bookingPlate">Placa do veículo</label>
+              <input
+                id="bookingPlate"
+                name="plate"
+                type="text"
+                placeholder="ABC-1234"
+                required
+              />
+            </div>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="bookingDate">Data</label>
+                <input id="bookingDate" name="date" type="date" required />
+              </div>
+              <div class="form-field">
+                <label for="bookingTime">Horário</label>
+                <select id="bookingTime" name="time" required>
+                  <option value="">Selecione</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="bookingService">Tipo de serviço</label>
+              <select id="bookingService" name="service" required></select>
+            </div>
+            <div class="form-field">
+              <label for="bookingPayment">Forma de pagamento</label>
+              <select id="bookingPayment" name="payment" required>
+                <option value="Cartão">Cartão</option>
+                <option value="Pix">Pix</option>
+                <option value="Dinheiro">Dinheiro</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary">Confirmar agendamento</button>
+          </form>
+          <div class="card booking__list">
+            <header>
+              <span class="card__label">Agendamentos confirmados</span>
+              <h3>Próximas visitas</h3>
+            </header>
+            <ul class="booking-list" id="bookingList"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section plans" id="planos">
+        <header class="section__header">
+          <span class="section__label">Planos ativos</span>
+          <h2>Gerencie seus benefícios recorrentes</h2>
+        </header>
+        <div class="plans__layout">
+          <article class="card active-plans-card" id="activePlansCard">
+            <header>
+              <span class="card__label">Seus planos</span>
+              <h3>Resumo das assinaturas</h3>
+            </header>
+            <ul id="activePlansList" class="active-plans"></ul>
+          </article>
+          <div class="plans__grid" id="plansGrid"></div>
+        </div>
+      </section>
+
+      <section class="section payments" id="historico">
+        <header class="section__header">
+          <span class="section__label">Histórico de compras</span>
+          <h2>Acompanhe o status das suas cobranças</h2>
+        </header>
+        <div class="card table-card">
+          <table id="customerPayments">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Serviço</th>
+                <th>Valor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section tips" id="dicas">
+        <header class="section__header">
+          <span class="section__label">Painel de dicas</span>
+          <h2>Cuidados rápidos para manter o carro impecável</h2>
+        </header>
+        <div class="card tips__card">
+          <ul id="tipsList"></ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Lavacar</strong>
+        <p>Excelência em estética automotiva de alto padrão.</p>
+      </div>
+      <div>
+        <span>Atendimento</span>
+        <p>Segunda a sábado, das 8h às 18h.</p>
+      </div>
+      <div>
+        <span>Precisa de ajuda?</span>
+        <p>Contato via WhatsApp (48) 99999-0000</p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
