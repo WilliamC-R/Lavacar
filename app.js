@@ -60,7 +60,8 @@ const clientState = {
   customers: [
     {
       cpf: "12345678901",
-      password: "123",
+      password: "1234",
+      email: "marcos.lopes@example.com",
       name: "Marcos Lopes",
       vehicle: { plate: "QWE-9876", model: "SUV Volvo XC40" },
       plans: [
@@ -83,7 +84,8 @@ const clientState = {
     },
     {
       cpf: "98765432100",
-      password: "456",
+      password: "4567",
+      email: "juliana.reis@example.com",
       name: "Juliana Reis",
       vehicle: { plate: "HJK-5521", model: "Sedã Toyota Corolla" },
       plans: [
@@ -165,6 +167,87 @@ const teamState = {
 
 let loggedCustomer = null;
 
+const STORAGE_KEYS = {
+  customers: "lavacar_customers",
+  loggedCpf: "lavacar_logged_cpf",
+  loginMessage: "lavacar_login_message",
+};
+
+function getStorage(type) {
+  if (typeof window === "undefined") return null;
+  return type === "local" ? window.localStorage : window.sessionStorage;
+}
+
+function loadPersistedCustomers() {
+  const storage = getStorage("local");
+  if (!storage) return;
+  const stored = storage.getItem(STORAGE_KEYS.customers);
+  if (!stored) return;
+  try {
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return;
+    const knownCpfs = new Set(clientState.customers.map((customer) => customer.cpf));
+    parsed.forEach((customer) => {
+      if (!customer || typeof customer.cpf !== "string") return;
+      if (knownCpfs.has(customer.cpf)) return;
+      clientState.customers.push(customer);
+      knownCpfs.add(customer.cpf);
+    });
+  } catch (error) {
+    console.error("Não foi possível carregar clientes persistidos.", error);
+  }
+}
+
+function persistCustomers() {
+  const storage = getStorage("local");
+  if (!storage) return;
+  storage.setItem(STORAGE_KEYS.customers, JSON.stringify(clientState.customers));
+}
+
+function setLoggedCustomerCpf(cpf) {
+  const storage = getStorage("session");
+  if (!storage) return;
+  if (!cpf) {
+    storage.removeItem(STORAGE_KEYS.loggedCpf);
+    return;
+  }
+  storage.setItem(STORAGE_KEYS.loggedCpf, cpf);
+}
+
+function getLoggedCustomerCpf() {
+  const storage = getStorage("session");
+  if (!storage) return null;
+  return storage.getItem(STORAGE_KEYS.loggedCpf);
+}
+
+function clearLoggedCustomerCpf() {
+  const storage = getStorage("session");
+  if (!storage) return;
+  storage.removeItem(STORAGE_KEYS.loggedCpf);
+}
+
+function setLoginMessage(name) {
+  const storage = getStorage("session");
+  if (!storage) return;
+  if (!name) {
+    storage.removeItem(STORAGE_KEYS.loginMessage);
+    return;
+  }
+  storage.setItem(STORAGE_KEYS.loginMessage, name);
+}
+
+function consumeLoginMessage() {
+  const storage = getStorage("session");
+  if (!storage) return null;
+  const message = storage.getItem(STORAGE_KEYS.loginMessage);
+  if (message) {
+    storage.removeItem(STORAGE_KEYS.loginMessage);
+  }
+  return message;
+}
+
+loadPersistedCustomers();
+
 function showToast(message) {
   const toast = document.querySelector("#toast");
   if (!toast) return;
@@ -197,9 +280,8 @@ function maskCpf(value) {
 }
 
 function initCliente() {
-  const loginForm = document.querySelector("#loginForm");
-  const loginCard = document.querySelector("#loginCard");
   const profileCard = document.querySelector("#profileCard");
+  const loginReminderCard = document.querySelector("#loginReminderCard");
   const profileName = document.querySelector("#profileName");
   const profileCpf = document.querySelector("#profileCpf");
   const profilePlans = document.querySelector("#profilePlans");
@@ -210,8 +292,27 @@ function initCliente() {
   const paymentsTable = document.querySelector("#customerPayments tbody");
   const historyCard = document.querySelector("#historyCard");
 
-  if (!loginForm || !activePlansList || !paymentsTable) {
+  if (!activePlansList || !paymentsTable) {
     return;
+  }
+
+  const storedCpf = getLoggedCustomerCpf();
+  if (storedCpf) {
+    const customer = clientState.customers.find((item) => item.cpf === storedCpf);
+    if (customer) {
+      loggedCustomer = customer;
+    } else {
+      clearLoggedCustomerCpf();
+    }
+  }
+
+  function updateAccessCards() {
+    if (profileCard) {
+      profileCard.hidden = !loggedCustomer;
+    }
+    if (loginReminderCard) {
+      loginReminderCard.hidden = !!loggedCustomer;
+    }
   }
 
   function renderPayments() {
@@ -220,7 +321,8 @@ function initCliente() {
       historyCard?.classList.add("is-muted");
       const tr = document.createElement("tr");
       tr.className = "empty-row";
-      tr.innerHTML = '<td colspan="4">Faça login para visualizar seu histórico.</td>';
+      tr.innerHTML =
+        '<td colspan="4">Acesse sua conta na <a href="autenticacao.html">área de autenticação</a> para visualizar o histórico.</td>';
       paymentsTable.appendChild(tr);
       return;
     }
@@ -257,7 +359,8 @@ function initCliente() {
     activePlansList.innerHTML = "";
     if (!loggedCustomer) {
       activePlansCard?.classList.add("is-muted");
-      activePlansList.innerHTML = '<li class="empty-state">Faça login para acompanhar seus planos.</li>';
+      activePlansList.innerHTML =
+        '<li class="empty-state">Entre na sua conta para acompanhar os planos ativos.</li>';
       return;
     }
 
@@ -320,11 +423,68 @@ function initCliente() {
     }
   }
 
+  logoutButton?.addEventListener("click", () => {
+    loggedCustomer = null;
+    clearLoggedCustomerCpf();
+    setLoginMessage(null);
+    updateAccessCards();
+    renderActivePlans();
+    renderPayments();
+    updateProfile();
+    showToast("Sessão encerrada com sucesso.");
+  });
+
+  updateAccessCards();
+  renderActivePlans();
+  renderPayments();
+  updateProfile();
+
+  const loginMessage = consumeLoginMessage();
+  if (loginMessage && loggedCustomer) {
+    const firstName = loginMessage.split(" ")[0];
+    showToast(`Bem-vindo(a), ${firstName}!`);
+  }
+}
+
+function initAuth() {
+  const loginForm = document.querySelector("#authLoginForm");
+  const signupForm = document.querySelector("#signupForm");
+
+  if (!loginForm) {
+    return;
+  }
+
+  const storedCpf = getLoggedCustomerCpf();
+  if (storedCpf) {
+    const customer = clientState.customers.find((item) => item.cpf === storedCpf);
+    if (customer) {
+      loggedCustomer = customer;
+      setLoginMessage(customer.name);
+      showToast("Você já está autenticado. Redirecionando para o portal...");
+      setTimeout(() => {
+        window.location.href = "cliente.html";
+      }, 600);
+      return;
+    }
+    clearLoggedCustomerCpf();
+  }
+
   loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(loginForm);
     const cpf = sanitizeCpf(formData.get("cpf") || "");
     const password = (formData.get("password") || "").trim();
+
+    if (cpf.length !== 11) {
+      showToast("Informe um CPF válido com 11 dígitos.");
+      return;
+    }
+
+    if (!/^\d{4}$/.test(password)) {
+      showToast("A senha precisa conter exatamente 4 dígitos.");
+      return;
+    }
+
     const customer = clientState.customers.find(
       (item) => item.cpf === cpf && item.password === password
     );
@@ -335,28 +495,55 @@ function initCliente() {
     }
 
     loggedCustomer = customer;
-    loginCard.hidden = true;
-    profileCard.hidden = false;
-    renderActivePlans();
-    renderPayments();
-    updateProfile();
-    showToast(`Bem-vindo(a), ${customer.name.split(" ")[0]}!`);
-  });
-
-  logoutButton?.addEventListener("click", () => {
-    loggedCustomer = null;
-    profileCard.hidden = true;
-    loginCard.hidden = false;
+    setLoggedCustomerCpf(customer.cpf);
+    setLoginMessage(customer.name);
     loginForm.reset();
-    renderActivePlans();
-    renderPayments();
-    updateProfile();
-    showToast("Sessão encerrada com sucesso.");
+    window.location.href = "cliente.html";
   });
 
-  renderActivePlans();
-  renderPayments();
-  updateProfile();
+  signupForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(signupForm);
+    const name = (formData.get("name") || "").trim();
+    const cpf = sanitizeCpf(formData.get("cpf") || "");
+    const email = (formData.get("email") || "").trim();
+
+    if (!name || !email || cpf.length !== 11) {
+      showToast("Preencha nome, CPF e e-mail válidos para o cadastro.");
+      return;
+    }
+
+    const emailPattern = /^[\w-.]+@[\w-]+\.[A-Za-z]{2,}$/;
+    if (!emailPattern.test(email)) {
+      showToast("Informe um e-mail válido.");
+      return;
+    }
+
+    const alreadyExists = clientState.customers.some((item) => item.cpf === cpf);
+    if (alreadyExists) {
+      showToast("Este CPF já possui cadastro. Faça o login.");
+      return;
+    }
+
+    const generatedPassword = String(Math.floor(1000 + Math.random() * 9000));
+    const newCustomer = {
+      cpf,
+      password: generatedPassword,
+      name,
+      email,
+      vehicle: null,
+      plans: [],
+      bookings: [],
+      payments: [],
+    };
+
+    clientState.customers.push(newCustomer);
+    persistCustomers();
+    showToast(
+      `Cadastro realizado! Enviamos sua senha para ${email}. Senha: ${generatedPassword}.`
+    );
+    signupForm.reset();
+  });
 }
 
 function initEquipe() {
@@ -513,6 +700,8 @@ function initEquipe() {
 
 if (page === "cliente") {
   initCliente();
+} else if (page === "auth") {
+  initAuth();
 } else if (page === "equipe") {
   initEquipe();
 }

@@ -3,8 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lavacar • Redirecionando</title>
-    <meta http-equiv="refresh" content="0; url=cliente.html" />
+    <title>Lavacar • Escolha sua área</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,22 +11,61 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <script>
-      window.addEventListener('DOMContentLoaded', () => {
-        if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/')) {
-          window.location.replace('cliente.html');
-        }
-      });
-    </script>
   </head>
-  <body class="redirect">
-    <main class="redirect__content">
-      <h1>Redirecionando para o portal do cliente…</h1>
-      <p>
-        Se o redirecionamento não acontecer automaticamente,
-        <a href="cliente.html">clique aqui para acessar a área do cliente</a>
-        ou vá direto para a <a href="equipe.html">área da equipe</a>.
-      </p>
+  <body data-page="landing">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand__logo">Lavacar</span>
+        <span class="brand__subtitle">Experiência completa em estética automotiva</span>
+      </div>
+      <nav class="top-bar__nav">
+        <a class="nav-link" href="autenticacao.html">Área do cliente</a>
+        <a class="nav-link" href="equipe.html">Área da equipe</a>
+      </nav>
+    </header>
+
+    <main class="page page--landing">
+      <section class="hero">
+        <header class="hero__content">
+          <span class="hero__label">Bem-vindo</span>
+          <h1>Selecione a área que deseja acessar</h1>
+          <p>
+            Clientes podem autenticar com CPF e senha de 4 dígitos para acompanhar planos e
+            histórico. A equipe encontra aqui controles de operações e estoque.
+          </p>
+          <div class="hero__actions">
+            <a class="btn-primary" href="autenticacao.html">Entrar na área do cliente</a>
+            <a class="btn-secondary" href="equipe.html">Ir para a equipe</a>
+          </div>
+        </header>
+        <div class="hero__cards">
+          <article class="card hero-card">
+            <span class="card__label">Cliente</span>
+            <h2>Agendamentos e planos</h2>
+            <p>Consulte assinaturas, pagamentos confirmados e histórico de serviços.</p>
+          </article>
+          <article class="card hero-card">
+            <span class="card__label">Equipe</span>
+            <h2>Operações do dia</h2>
+            <p>Organize tarefas, confirme pagamentos e acompanhe o estoque.</p>
+          </article>
+        </div>
+      </section>
     </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Lavacar</strong>
+        <p>Excelência em estética automotiva de alto padrão.</p>
+      </div>
+      <div>
+        <span>Atendimento</span>
+        <p>Segunda a sábado, das 8h às 18h.</p>
+      </div>
+      <div>
+        <span>Precisa de ajuda?</span>
+        <p>Contato via WhatsApp (48) 99999-0000</p>
+      </div>
+    </footer>
   </body>
 </html>
