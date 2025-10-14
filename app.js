@@ -67,16 +67,7 @@ const clientState = {
       plans: [
         { name: "Premium", price: "R$ 129/mês", renewDate: "20/07", status: "Ativo" },
       ],
-      bookings: [
-        {
-          name: "Marcos Lopes",
-          plate: "QWE-9876",
-          service: "Lavagem premium",
-          payment: "Cartão",
-          date: todayISO,
-          time: "09:00",
-        },
-      ],
+      bookings: [],
       payments: [
         { date: "10/07", service: "Lavagem premium", value: 129.9, status: "Pago" },
         { date: "02/07", service: "Plano Premium", value: 129.9, status: "Pago" },
@@ -91,16 +82,7 @@ const clientState = {
       plans: [
         { name: "Express", price: "R$ 79/mês", renewDate: "12/07", status: "Ativo" },
       ],
-      bookings: [
-        {
-          name: "Juliana Reis",
-          plate: "HJK-5521",
-          service: "Higienização + ozônio",
-          payment: "Pix",
-          date: todayISO,
-          time: "14:00",
-        },
-      ],
+      bookings: [],
       payments: [
         { date: "08/07", service: "Higienização + ozônio", value: 189.9, status: "Pendente" },
         { date: "08/06", service: "Plano Express", value: 79.9, status: "Pago" },
