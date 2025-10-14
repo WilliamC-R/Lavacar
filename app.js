@@ -31,30 +31,25 @@ const clientState = {
       duration: "180 min",
     },
   ],
-  plans: [
+  planCatalog: [
     {
       name: "Express",
       price: "R$ 79/mês",
       benefits: ["2 lavagens express", "Lembretes automáticos", "10% OFF em adicionais"],
-      active: 86,
+      trend: 86,
     },
     {
       name: "Premium",
       price: "R$ 129/mês",
       benefits: ["4 lavagens premium", "Vaga prioritária", "Aplicação de cera trimestral"],
-      active: 54,
+      trend: 54,
     },
     {
       name: "Black",
       price: "R$ 199/mês",
       benefits: ["6 lavações completas", "Busca e entrega", "Relatório fotográfico"],
-      active: 27,
+      trend: 27,
     },
-  ],
-  payments: [
-    { date: "10/07", service: "Lavagem premium", value: 129.9, status: "Pago" },
-    { date: "08/07", service: "Higienização + ozônio", value: 189.9, status: "Pendente" },
-    { date: "06/07", service: "Proteção cerâmica", value: 449.9, status: "Pago" },
   ],
   tips: [
     "Mantenha o veículo coberto para preservar o brilho por mais tempo.",
@@ -62,22 +57,52 @@ const clientState = {
     "Faça aspiração quinzenal para reduzir desgaste do estofado.",
     "Aplique protetor UV nos plásticos para evitar ressecamento.",
   ],
-  bookings: [
+  customers: [
     {
+      cpf: "12345678901",
+      password: "123",
       name: "Marcos Lopes",
-      plate: "QWE-9876",
-      service: "Lavagem premium",
-      payment: "Cartão",
-      date: todayISO,
-      time: "09:00",
+      vehicle: { plate: "QWE-9876", model: "SUV Volvo XC40" },
+      plans: [
+        { name: "Premium", price: "R$ 129/mês", renewDate: "20/07", status: "Ativo" },
+      ],
+      bookings: [
+        {
+          name: "Marcos Lopes",
+          plate: "QWE-9876",
+          service: "Lavagem premium",
+          payment: "Cartão",
+          date: todayISO,
+          time: "09:00",
+        },
+      ],
+      payments: [
+        { date: "10/07", service: "Lavagem premium", value: 129.9, status: "Pago" },
+        { date: "02/07", service: "Plano Premium", value: 129.9, status: "Pago" },
+      ],
     },
     {
+      cpf: "98765432100",
+      password: "456",
       name: "Juliana Reis",
-      plate: "HJK-5521",
-      service: "Higienização + ozônio",
-      payment: "Pix",
-      date: todayISO,
-      time: "14:00",
+      vehicle: { plate: "HJK-5521", model: "Sedã Toyota Corolla" },
+      plans: [
+        { name: "Express", price: "R$ 79/mês", renewDate: "12/07", status: "Ativo" },
+      ],
+      bookings: [
+        {
+          name: "Juliana Reis",
+          plate: "HJK-5521",
+          service: "Higienização + ozônio",
+          payment: "Pix",
+          date: todayISO,
+          time: "14:00",
+        },
+      ],
+      payments: [
+        { date: "08/07", service: "Higienização + ozônio", value: 189.9, status: "Pendente" },
+        { date: "08/06", service: "Plano Express", value: 79.9, status: "Pago" },
+      ],
     },
   ],
 };
@@ -138,9 +163,7 @@ const teamState = {
   ],
 };
 
-const reservations = new Map();
-const planSubscriptions = new Set();
-let extraPlanCount = 0;
+let loggedCustomer = null;
 
 function showToast(message) {
   const toast = document.querySelector("#toast");
@@ -165,6 +188,38 @@ function toDisplayDate(value) {
   return `${day}/${month}`;
 }
 
+function sanitizeCpf(value) {
+  return value.replace(/\D/g, "");
+}
+
+function maskCpf(value) {
+  if (!value) return "";
+  const digits = sanitizeCpf(value);
+  if (digits.length !== 11) {
+    return value;
+  }
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
+}
+
+function getAllBookings() {
+  return clientState.customers.flatMap((customer) => customer.bookings);
+}
+
+function getNextBooking(customer) {
+  if (!customer || !customer.bookings.length) return null;
+  const upcoming = [...customer.bookings].sort((a, b) => {
+    if (a.date === b.date) {
+      return a.time.localeCompare(b.time);
+    }
+    return a.date.localeCompare(b.date);
+  });
+  const nowISO = today.toISOString().split("T")[0];
+  return (
+    upcoming.find((booking) => booking.date >= nowISO) ||
+    upcoming[0]
+  );
+}
+
 function initCliente() {
   const availabilityList = document.querySelector("#availabilityList");
   const bookingForm = document.querySelector("#bookingForm");
@@ -176,8 +231,20 @@ function initCliente() {
   const tipsList = document.querySelector("#tipsList");
   const servicesGrid = document.querySelector("#servicesGrid");
   const plansGrid = document.querySelector("#plansGrid");
+  const activePlansList = document.querySelector("#activePlansList");
+  const activePlansCard = document.querySelector("#activePlansCard");
   const activePlansEl = document.querySelector("#activePlans");
   const todayBookingsEl = document.querySelector("#todayBookings");
+  const loginForm = document.querySelector("#loginForm");
+  const loginCard = document.querySelector("#loginCard");
+  const profileCard = document.querySelector("#profileCard");
+  const profileName = document.querySelector("#profileName");
+  const profileCpf = document.querySelector("#profileCpf");
+  const profilePlans = document.querySelector("#profilePlans");
+  const profileNextBooking = document.querySelector("#profileNextBooking");
+  const logoutButton = document.querySelector("#logoutButton");
+  const bookingNameInput = document.querySelector("#bookingName");
+  const bookingPlateInput = document.querySelector("#bookingPlate");
 
   if (!availabilityList) return;
 
@@ -206,31 +273,50 @@ function initCliente() {
     });
   }
 
+  function toggleBookingForm(isLocked) {
+    if (!bookingForm) return;
+    bookingForm.classList.toggle("is-locked", isLocked);
+    bookingForm.querySelectorAll("input, select, button").forEach((element) => {
+      if (element.id === "bookingName") {
+        element.readOnly = !!loggedCustomer;
+      }
+      if (element.id === "bookingPlate") {
+        element.readOnly = false;
+      }
+      element.disabled = isLocked && element.type !== "hidden";
+    });
+  }
+
   function renderPlans() {
     plansGrid.innerHTML = "";
-    clientState.plans.forEach((plan) => {
+    clientState.planCatalog.forEach((plan) => {
       const card = document.createElement("article");
       card.className = "plan-card";
+      const isActive = loggedCustomer?.plans.some((userPlan) => userPlan.name === plan.name);
       card.innerHTML = `
         <h3>${plan.name}</h3>
         <p class="plan-card__price">${plan.price}</p>
         <ul>
           ${plan.benefits.map((benefit) => `<li>${benefit}</li>`).join("")}
         </ul>
-        <button type="button" data-plan="${plan.name}">Assinar plano</button>
-        <small class="plan-card__active">${plan.active} clientes ativos</small>
+        <button type="button" data-plan="${plan.name}" ${isActive ? "disabled" : ""}>
+          ${isActive ? "Plano ativo" : "Assinar plano"}
+        </button>
+        <small class="plan-card__active">${plan.trend} clientes ativos</small>
       `;
       plansGrid.appendChild(card);
     });
+    plansGrid
+      .querySelectorAll("button[data-plan]")
+      .forEach((button) => button.classList.toggle("is-disabled", !loggedCustomer));
   }
 
   function renderAvailability(date) {
     availabilityList.innerHTML = "";
+    const bookings = getAllBookings();
     clientState.timeSlots.forEach((slot) => {
       const key = `${date}|${slot}`;
-      const isBooked =
-        reservations.has(key) ||
-        clientState.bookings.some((booking) => booking.date === date && booking.time === slot);
+      const isBooked = bookings.some((booking) => booking.date === date && booking.time === slot);
       const li = document.createElement("li");
       li.innerHTML = `
         <span>${slot}</span>
@@ -244,11 +330,9 @@ function initCliente() {
 
   function renderTimeOptions(date) {
     bookingTimeSelect.innerHTML = '<option value="">Selecione</option>';
+    const bookings = getAllBookings();
     clientState.timeSlots.forEach((slot) => {
-      const key = `${date}|${slot}`;
-      const isBooked =
-        reservations.has(key) ||
-        clientState.bookings.some((booking) => booking.date === date && booking.time === slot);
+      const isBooked = bookings.some((booking) => booking.date === date && booking.time === slot);
       const option = document.createElement("option");
       option.value = slot;
       option.textContent = slot;
@@ -261,11 +345,23 @@ function initCliente() {
 
   function renderBookings() {
     bookingList.innerHTML = "";
-    const allBookings = [...clientState.bookings];
-    reservations.forEach((booking) => {
-      allBookings.push(booking);
-    });
-    allBookings
+    if (!loggedCustomer) {
+      const li = document.createElement("li");
+      li.className = "empty-state";
+      li.textContent = "Faça login para visualizar seus agendamentos.";
+      bookingList.appendChild(li);
+      return;
+    }
+
+    if (!loggedCustomer.bookings.length) {
+      const li = document.createElement("li");
+      li.className = "empty-state";
+      li.textContent = "Nenhum agendamento cadastrado ainda.";
+      bookingList.appendChild(li);
+      return;
+    }
+
+    [...loggedCustomer.bookings]
       .sort((a, b) => {
         if (a.date === b.date) {
           return a.time.localeCompare(b.time);
@@ -278,7 +374,7 @@ function initCliente() {
         li.innerHTML = `
           <strong>${booking.service}</strong>
           <div class="booking-item__meta">
-            <span>${booking.name} • ${booking.plate}</span>
+            <span>${booking.plate}</span>
             <span>${toDisplayDate(booking.date)} às ${booking.time}</span>
           </div>
         `;
@@ -288,7 +384,23 @@ function initCliente() {
 
   function renderPayments() {
     paymentsTable.innerHTML = "";
-    clientState.payments.forEach((payment) => {
+    if (!loggedCustomer) {
+      const tr = document.createElement("tr");
+      tr.className = "empty-row";
+      tr.innerHTML = '<td colspan="4">Faça login para visualizar seu histórico.</td>';
+      paymentsTable.appendChild(tr);
+      return;
+    }
+
+    if (!loggedCustomer.payments.length) {
+      const tr = document.createElement("tr");
+      tr.className = "empty-row";
+      tr.innerHTML = '<td colspan="4">Nenhum pagamento registrado até o momento.</td>';
+      paymentsTable.appendChild(tr);
+      return;
+    }
+
+    loggedCustomer.payments.forEach((payment) => {
       const tr = document.createElement("tr");
       const badgeClass =
         payment.status === "Pago"
@@ -306,6 +418,38 @@ function initCliente() {
     });
   }
 
+  function renderActivePlans() {
+    if (!activePlansList || !activePlansCard) return;
+    activePlansList.innerHTML = "";
+    if (!loggedCustomer) {
+      activePlansList.innerHTML = '<li class="empty-state">Faça login para acompanhar seus planos.</li>';
+      activePlansCard.classList.add("is-muted");
+      return;
+    }
+    activePlansCard.classList.remove("is-muted");
+
+    if (!loggedCustomer.plans.length) {
+      activePlansList.innerHTML = '<li class="empty-state">Nenhum plano ativo no momento.</li>';
+      return;
+    }
+
+    loggedCustomer.plans.forEach((plan) => {
+      const li = document.createElement("li");
+      li.className = "active-plan";
+      li.innerHTML = `
+        <div>
+          <strong>${plan.name}</strong>
+          <span>${plan.price}</span>
+        </div>
+        <div class="active-plan__meta">
+          <span class="badge badge--available">${plan.status}</span>
+          <span>Renova em ${plan.renewDate}</span>
+        </div>
+      `;
+      activePlansList.appendChild(li);
+    });
+  }
+
   function renderTips() {
     tipsList.innerHTML = "";
     clientState.tips.forEach((tip) => {
@@ -316,21 +460,63 @@ function initCliente() {
   }
 
   function updateMetrics() {
-    const basePlans = clientState.plans.reduce((acc, plan) => acc + plan.active, 0);
-    activePlansEl.textContent = basePlans + extraPlanCount;
+    activePlansEl.textContent = loggedCustomer?.plans.length ?? 0;
+    if (!loggedCustomer) {
+      todayBookingsEl.textContent = "0";
+      return;
+    }
+    const todays = loggedCustomer.bookings.filter((booking) => booking.date === todayISO).length;
+    todayBookingsEl.textContent = todays;
+  }
 
-    const todays = clientState.bookings.filter((booking) => booking.date === todayISO).length;
-    let extraToday = 0;
-    reservations.forEach((booking) => {
-      if (booking.date === todayISO) {
-        extraToday += 1;
-      }
-    });
-    todayBookingsEl.textContent = todays + extraToday;
+  function updateProfile() {
+    if (
+      !profileCard ||
+      !profileName ||
+      !profileCpf ||
+      !profilePlans ||
+      !profileNextBooking ||
+      !loggedCustomer
+    ) {
+      return;
+    }
+    profileName.textContent = loggedCustomer.name;
+    profileCpf.textContent = maskCpf(loggedCustomer.cpf);
+    profilePlans.textContent = loggedCustomer.plans.length;
+    const nextBooking = getNextBooking(loggedCustomer);
+    if (nextBooking) {
+      profileNextBooking.textContent = `${toDisplayDate(nextBooking.date)} às ${nextBooking.time}`;
+    } else {
+      profileNextBooking.textContent = "Sem agendamentos";
+    }
+    if (bookingNameInput) bookingNameInput.value = loggedCustomer.name;
+    if (bookingPlateInput) bookingPlateInput.value = loggedCustomer.vehicle?.plate ?? "";
+  }
+
+  function resetProfile() {
+    if (!profileCard) return;
+    profileName.textContent = "";
+    profileCpf.textContent = "";
+    profilePlans.textContent = "0";
+    profileNextBooking.textContent = "Sem agendamentos";
+    if (bookingForm) bookingForm.reset();
+    if (bookingDateInput) {
+      bookingDateInput.value = todayISO;
+      renderTimeOptions(todayISO);
+    }
+  }
+
+  function requireAuthentication(message) {
+    if (loggedCustomer) return false;
+    showToast(message);
+    return true;
   }
 
   bookingForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (requireAuthentication("Faça login para criar um agendamento.")) {
+      return;
+    }
     const formData = new FormData(bookingForm);
     const data = Object.fromEntries(formData.entries());
     const key = `${data.date}|${data.time}`;
@@ -340,13 +526,14 @@ function initCliente() {
       return;
     }
 
-    if (reservations.has(key) || clientState.bookings.some((b) => b.date === data.date && b.time === data.time)) {
+    const bookings = getAllBookings();
+    if (bookings.some((b) => b.date === data.date && b.time === data.time)) {
       showToast("Este horário já foi reservado");
       return;
     }
 
     const booking = {
-      name: data.name.trim(),
+      name: loggedCustomer.name,
       plate: data.plate.trim().toUpperCase(),
       service: data.service,
       payment: data.payment,
@@ -354,13 +541,14 @@ function initCliente() {
       time: data.time,
     };
 
-    reservations.set(key, booking);
+    loggedCustomer.bookings.push(booking);
     bookingForm.reset();
     bookingDateInput.value = data.date;
     renderAvailability(data.date);
     renderTimeOptions(data.date);
     renderBookings();
     updateMetrics();
+    updateProfile();
     showToast("Agendamento confirmado!");
   });
 
@@ -373,23 +561,88 @@ function initCliente() {
   plansGrid.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-plan]");
     if (!button) return;
+    if (requireAuthentication("Faça login para gerenciar seus planos.")) {
+      return;
+    }
     const planName = button.dataset.plan;
-    if (planSubscriptions.has(planName)) {
+    if (loggedCustomer.plans.some((plan) => plan.name === planName)) {
       showToast("Plano já está ativo para este cliente");
       return;
     }
-    planSubscriptions.add(planName);
-    extraPlanCount += 1;
+    const catalogPlan = clientState.planCatalog.find((plan) => plan.name === planName);
+    if (!catalogPlan) return;
+    const renewalDate = new Date();
+    renewalDate.setMonth(renewalDate.getMonth() + 1);
+    const renewDate = renewalDate
+      .toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      })
+      .split("/")
+      .slice(0, 2)
+      .join("/");
+    loggedCustomer.plans.push({
+      name: catalogPlan.name,
+      price: catalogPlan.price,
+      renewDate,
+      status: "Ativo",
+    });
+    renderPlans();
+    renderActivePlans();
     updateMetrics();
+    updateProfile();
     showToast(`Plano ${planName} ativado com sucesso!`);
   });
 
+  loginForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(loginForm);
+    const cpf = sanitizeCpf(formData.get("cpf") || "");
+    const password = (formData.get("password") || "").trim();
+    const customer = clientState.customers.find(
+      (item) => item.cpf === cpf && item.password === password
+    );
+    if (!customer) {
+      showToast("CPF ou senha inválidos. Tente novamente.");
+      return;
+    }
+    loggedCustomer = customer;
+    if (loginCard) loginCard.hidden = true;
+    if (profileCard) profileCard.hidden = false;
+    toggleBookingForm(false);
+    renderBookings();
+    renderPayments();
+    renderPlans();
+    renderActivePlans();
+    updateMetrics();
+    updateProfile();
+    renderAvailability(bookingDateInput.value);
+    showToast(`Bem-vindo(a), ${customer.name.split(" ")[0]}!`);
+  });
+
+  logoutButton?.addEventListener("click", () => {
+    loggedCustomer = null;
+    if (profileCard) profileCard.hidden = true;
+    if (loginCard) loginCard.hidden = false;
+    toggleBookingForm(true);
+    resetProfile();
+    renderBookings();
+    renderPayments();
+    renderPlans();
+    renderActivePlans();
+    updateMetrics();
+    renderAvailability(bookingDateInput.value);
+    showToast("Sessão encerrada com sucesso.");
+  });
+
+  toggleBookingForm(true);
   renderServices();
   renderPlans();
   renderAvailability(todayISO);
   renderTimeOptions(todayISO);
   renderBookings();
   renderPayments();
+  renderActivePlans();
   renderTips();
   updateMetrics();
 }

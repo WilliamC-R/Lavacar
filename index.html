@@ -16,12 +16,13 @@
     <header class="top-bar">
       <div class="brand">
         <span class="brand__logo">Lavacar</span>
-        <span class="brand__subtitle">Seu carro impecável com poucos cliques</span>
+        <span class="brand__subtitle">Acompanhe seus cuidados automotivos em um só lugar</span>
       </div>
       <nav class="top-bar__nav">
-        <a class="nav-link is-active" href="index.html">Área do cliente</a>
+        <a class="nav-link is-active" href="#agendamentos">Agendamentos</a>
+        <a class="nav-link" href="#historico">Histórico de compras</a>
+        <a class="nav-link" href="#planos">Planos ativos</a>
         <a class="nav-link" href="equipe.html">Área da equipe</a>
-        <a class="cta" href="#agendamento">Agendar agora</a>
       </nav>
     </header>
 
@@ -50,13 +51,60 @@
           </div>
         </div>
         <aside class="hero__panel">
+          <article class="card login-card" id="loginCard">
+            <header>
+              <span class="card__label">Acesso do cliente</span>
+              <h2>Entre com CPF e senha</h2>
+            </header>
+            <form id="loginForm" class="login-form">
+              <div class="form-field">
+                <label for="loginCpf">CPF</label>
+                <input id="loginCpf" name="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" required />
+              </div>
+              <div class="form-field">
+                <label for="loginPassword">Senha (3 dígitos)</label>
+                <input
+                  id="loginPassword"
+                  name="password"
+                  type="password"
+                  inputmode="numeric"
+                  pattern="[0-9]{3}"
+                  maxlength="3"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-primary">Acessar conta</button>
+            </form>
+            <p class="login-help">O acesso é exclusivo para clientes cadastrados na recepção.</p>
+          </article>
+          <article class="card profile-card" id="profileCard" hidden>
+            <header>
+              <span class="card__label">Cliente autenticado</span>
+              <h2 id="profileName"></h2>
+            </header>
+            <dl class="profile-card__info">
+              <div>
+                <dt>CPF</dt>
+                <dd id="profileCpf"></dd>
+              </div>
+              <div>
+                <dt>Próximo serviço</dt>
+                <dd id="profileNextBooking">Sem agendamentos</dd>
+              </div>
+              <div>
+                <dt>Planos ativos</dt>
+                <dd id="profilePlans">0</dd>
+              </div>
+            </dl>
+            <button type="button" class="btn-secondary" id="logoutButton">Sair</button>
+          </article>
           <article class="card schedule-card">
             <header>
               <span class="card__label">Horários disponíveis</span>
               <h2>Reserve em segundos</h2>
             </header>
             <ul class="availability" id="availabilityList"></ul>
-            <a href="#agendamento" class="btn-primary">Fazer agendamento</a>
+            <a href="#agendamentos" class="btn-primary">Fazer agendamento</a>
           </article>
           <article class="card metric-card">
             <div>
@@ -79,17 +127,9 @@
         <div class="services__grid" id="servicesGrid"></div>
       </section>
 
-      <section class="section plans" id="planos">
+      <section class="section booking" id="agendamentos">
         <header class="section__header">
-          <span class="section__label">Planos recorrentes</span>
-          <h2>Mais economia com benefícios exclusivos</h2>
-        </header>
-        <div class="plans__grid" id="plansGrid"></div>
-      </section>
-
-      <section class="section booking" id="agendamento">
-        <header class="section__header">
-          <span class="section__label">Faça seu agendamento</span>
+          <span class="section__label">Agendamentos</span>
           <h2>Escolha o melhor dia e horário para você</h2>
         </header>
         <div class="booking__layout">
@@ -144,10 +184,27 @@
         </div>
       </section>
 
-      <section class="section payments" id="pagamentos">
+      <section class="section plans" id="planos">
         <header class="section__header">
-          <span class="section__label">Pagamentos</span>
-          <h2>Acompanhe o status das últimas cobranças</h2>
+          <span class="section__label">Planos ativos</span>
+          <h2>Gerencie seus benefícios recorrentes</h2>
+        </header>
+        <div class="plans__layout">
+          <article class="card active-plans-card" id="activePlansCard">
+            <header>
+              <span class="card__label">Seus planos</span>
+              <h3>Resumo das assinaturas</h3>
+            </header>
+            <ul id="activePlansList" class="active-plans"></ul>
+          </article>
+          <div class="plans__grid" id="plansGrid"></div>
+        </div>
+      </section>
+
+      <section class="section payments" id="historico">
+        <header class="section__header">
+          <span class="section__label">Histórico de compras</span>
+          <h2>Acompanhe o status das suas cobranças</h2>
         </header>
         <div class="card table-card">
           <table id="customerPayments">
