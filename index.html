@@ -30,63 +30,105 @@
           <span class="section__label">Agendamento rápido</span>
           <h1>Reserve seu horário com CPF e placa</h1>
           <p>
-            Informe os dados essenciais e escolha o tipo de lavagem para garantir um horário em
-            menos de um minuto.
+            A nova experiência em etapas guia você pelo horário, dados e pagamento com animações
+            fluidas pensadas para o mobile.
           </p>
         </header>
-        <div class="quick-booking__grid">
-          <form class="card quick-booking__form" id="quickBookingForm" novalidate>
-            <div class="form-group">
-              <label for="bookingCpf">CPF</label>
-              <input type="text" id="bookingCpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
-            </div>
-            <div class="form-group">
-              <label for="bookingName">Nome completo</label>
-              <input type="text" id="bookingName" name="name" placeholder="Nome do cliente" required />
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="bookingPlate">Placa</label>
-                <input type="text" id="bookingPlate" name="plate" maxlength="8" placeholder="AAA0A00" required />
-              </div>
-              <div class="form-group">
-                <label for="bookingService">Tipo de lavagem</label>
-                <select id="bookingService" name="service" required>
-                  <option value="">Selecione</option>
-                </select>
-              </div>
-            </div>
-            <p class="form-helper">Selecione o horário disponível ao lado para concluir o agendamento.</p>
-            <button type="submit" class="btn-primary">Confirmar agendamento</button>
-          </form>
 
-          <aside class="card quick-booking__details">
-            <header>
-              <span class="card__label">Status do agendamento</span>
-              <h2>Escolha um horário disponível</h2>
-            </header>
-            <p id="selectedSlotInfo">Nenhum horário selecionado.</p>
-            <ul class="legend">
-              <li><span class="badge badge--available"></span> Disponível</li>
-              <li><span class="badge badge--danger"></span> Indisponível</li>
-              <li><span class="badge badge--pending"></span> Selecionado</li>
-            </ul>
-            <div class="details__cta">
-              <a class="btn-secondary" href="autenticacao.html">Acompanhar histórico</a>
-            </div>
-          </aside>
-        </div>
-      </section>
+        <form class="booking-flow" id="quickBookingForm" novalidate>
+          <div class="booking-flow__viewport">
+            <div class="booking-flow__track" data-current-step="slots">
+              <section class="card booking-step" data-step="slots">
+                <header>
+                  <span class="card__label">Escolha um horário disponível</span>
+                  <h2>Funcionamento das 08h às 21h</h2>
+                  <p>Toque em um horário verde para selecioná-lo e avance para preencher os dados.</p>
+                </header>
+                <p id="selectedSlotInfo" class="booking-step__status is-muted">Nenhum horário selecionado.</p>
+                <ul class="legend">
+                  <li><span class="badge badge--available"></span> Disponível</li>
+                  <li><span class="badge badge--danger"></span> Indisponível</li>
+                  <li><span class="badge badge--pending"></span> Selecionado</li>
+                </ul>
+                <ul class="time-slots" id="timeSlotsList"></ul>
+                <div class="booking-step__actions">
+                  <a class="btn-secondary" href="autenticacao.html">Acompanhar histórico</a>
+                  <button type="button" class="btn-primary" id="advanceToDetails" disabled>Confirmar horário</button>
+                </div>
+              </section>
 
-      <section class="section slots" id="horarios">
-        <header class="section__header">
-          <span class="section__label">Horários disponíveis</span>
-          <h2>Funcionamento das 08h às 21h</h2>
-          <p>Clique para selecionar um horário verde. Vermelho indica indisponibilidade.</p>
-        </header>
-        <div class="card slots-card">
-          <ul class="time-slots" id="timeSlotsList"></ul>
-        </div>
+              <section class="card booking-step" data-step="details" aria-hidden="true">
+                <header>
+                  <span class="card__label">Dados do agendamento</span>
+                  <h2>Informe CPF, placa e tipo de lavagem</h2>
+                  <p>Preencha seus dados para vincular o agendamento e facilitar próximos acessos.</p>
+                </header>
+                <div class="booking-step__form">
+                  <div class="form-group">
+                    <label for="bookingCpf">CPF</label>
+                    <input type="text" id="bookingCpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="bookingName">Nome completo</label>
+                    <input type="text" id="bookingName" name="name" placeholder="Nome do cliente" required />
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="bookingPlate">Placa</label>
+                      <input type="text" id="bookingPlate" name="plate" maxlength="8" placeholder="AAA0A00" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="bookingService">Tipo de lavagem</label>
+                      <select id="bookingService" name="service" required>
+                        <option value="">Selecione</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p class="form-helper">Os dados serão associados ao histórico para consultas futuras.</p>
+                </div>
+                <div class="booking-step__actions">
+                  <button type="button" class="btn-secondary" data-step-back="slots">Voltar</button>
+                  <button type="button" class="btn-primary" id="advanceToPayment">Ir para pagamento</button>
+                </div>
+              </section>
+
+              <section class="card booking-step" data-step="payment" aria-hidden="true">
+                <header>
+                  <span class="card__label">Pagamento</span>
+                  <h2>Finalize escolhendo a forma de pagamento</h2>
+                  <p>Selecione a opção preferida para confirmar o agendamento.</p>
+                </header>
+                <div class="payment-options">
+                  <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="PIX" />
+                    <div class="payment-option__content">
+                      <strong>PIX imediato</strong>
+                      <span>Chave enviada após confirmação</span>
+                    </div>
+                  </label>
+                  <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="Local" />
+                    <div class="payment-option__content">
+                      <strong>Pagar no local</strong>
+                      <span>Dinheiro ou débito na recepção</span>
+                    </div>
+                  </label>
+                  <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="Cartão" />
+                    <div class="payment-option__content">
+                      <strong>Apple Pay / Mercado Pago</strong>
+                      <span>Finalize digitalmente e agilize sua saída</span>
+                    </div>
+                  </label>
+                </div>
+                <div class="booking-step__actions">
+                  <button type="button" class="btn-secondary" data-step-back="details">Voltar</button>
+                  <button type="submit" class="btn-primary">Confirmar agendamento</button>
+                </div>
+              </section>
+            </div>
+          </div>
+        </form>
       </section>
 
       <section class="section plans" id="planos">

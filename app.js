@@ -336,14 +336,52 @@ function initLanding() {
   const timeSlotsList = document.querySelector("#timeSlotsList");
   const serviceSelect = document.querySelector("#bookingService");
   const selectedSlotInfo = document.querySelector("#selectedSlotInfo");
+  const flowViewport = form ? form.querySelector(".booking-flow__viewport") : null;
+  const flowTrack = form ? form.querySelector(".booking-flow__track") : null;
+  const advanceToDetailsButton = form ? form.querySelector("#advanceToDetails") : null;
+  const advanceToPaymentButton = form ? form.querySelector("#advanceToPayment") : null;
+  const backStepButtons = form ? form.querySelectorAll("[data-step-back]") : null;
   const planGrid = document.querySelector("#planCards");
   const tipsList = document.querySelector("#tipsList");
+  const flowSteps = ["slots", "details", "payment"];
+  let currentFlowStep = "slots";
 
   if (!form || !timeSlotsList || !serviceSelect) {
     return;
   }
 
   syncSlotsWithBookings();
+
+  function setFlowStep(step) {
+    if (!flowTrack || !flowSteps.includes(step)) return;
+    currentFlowStep = step;
+    const viewportWidth = flowViewport
+      ? flowViewport.clientWidth
+      : form.clientWidth;
+    const offset = viewportWidth * flowSteps.indexOf(step);
+    flowTrack.style.transform = `translateX(-${offset}px)`;
+    flowTrack.dataset.currentStep = step;
+    flowSteps.forEach((name) => {
+      const panel = flowTrack.querySelector(`[data-step="${name}"]`);
+      if (!panel) return;
+      const isActive = name === step;
+      panel.classList.toggle("is-active", isActive);
+      panel.setAttribute("aria-hidden", isActive ? "false" : "true");
+    });
+  }
+
+  const recalcFlowPosition = () => {
+    setFlowStep(currentFlowStep);
+  };
+
+  if (typeof ResizeObserver !== "undefined" && flowViewport) {
+    const resizeObserver = new ResizeObserver(() => {
+      recalcFlowPosition();
+    });
+    resizeObserver.observe(flowViewport);
+  } else {
+    window.addEventListener("resize", recalcFlowPosition);
+  }
 
   function renderServices() {
     serviceSelect.innerHTML = '<option value="">Selecione</option>';
@@ -363,6 +401,9 @@ function initLanding() {
     } else {
       selectedSlotInfo.textContent = "Nenhum horário selecionado.";
       selectedSlotInfo.classList.add("is-muted");
+    }
+    if (advanceToDetailsButton) {
+      advanceToDetailsButton.disabled = !bookingState.selectedSlot;
     }
   }
 
@@ -429,6 +470,73 @@ function initLanding() {
     renderTimeSlots();
   });
 
+  if (advanceToDetailsButton) {
+    advanceToDetailsButton.addEventListener("click", () => {
+      if (!bookingState.selectedSlot) {
+        showToast("Selecione um horário disponível antes de prosseguir.");
+        setFlowStep("slots");
+        return;
+      }
+      setFlowStep("details");
+      window.setTimeout(() => {
+        const cpfInput = form.querySelector("#bookingCpf");
+        cpfInput?.focus();
+      }, 200);
+    });
+  }
+
+  if (advanceToPaymentButton) {
+    advanceToPaymentButton.addEventListener("click", () => {
+      const detailsPanel = flowTrack?.querySelector('[data-step="details"]');
+      if (detailsPanel) {
+        const inputs = Array.from(detailsPanel.querySelectorAll("input, select"));
+        for (const field of inputs) {
+          if (!field.reportValidity()) {
+            field.focus();
+            return;
+          }
+        }
+      }
+      setFlowStep("payment");
+      window.setTimeout(() => {
+        const selectedPayment = form.querySelector('input[name="paymentMethod"]:checked');
+        if (!selectedPayment) {
+          const firstOption = form.querySelector('input[name="paymentMethod"]');
+          firstOption?.focus();
+        }
+      }, 220);
+    });
+  }
+
+  if (backStepButtons && backStepButtons.length) {
+    backStepButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.stepBack;
+        if (!target || !flowSteps.includes(target)) return;
+        setFlowStep(target);
+        if (target === "details") {
+          window.setTimeout(() => {
+            const cpfInput = form.querySelector("#bookingCpf");
+            cpfInput?.focus();
+          }, 200);
+        }
+        if (target === "slots") {
+          window.setTimeout(() => {
+            const activeSlotButton = timeSlotsList?.querySelector(".slot--selected");
+            if (activeSlotButton instanceof HTMLButtonElement) {
+              activeSlotButton.focus();
+              return;
+            }
+            const firstAvailable = timeSlotsList?.querySelector(".slot:not(:disabled)");
+            if (firstAvailable instanceof HTMLButtonElement) {
+              firstAvailable.focus();
+            }
+          }, 220);
+        }
+      });
+    });
+  }
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -436,6 +544,7 @@ function initLanding() {
     const name = (formData.get("name") || "").trim();
     const plate = sanitizePlate(formData.get("plate") || "");
     const service = formData.get("service") || "";
+    const paymentMethod = formData.get("paymentMethod") || "";
     const slot = bookingState.selectedSlot;
 
     if (cpf.length !== 11) {
@@ -460,6 +569,7 @@ function initLanding() {
 
     if (!slot) {
       showToast("Selecione um horário disponível na grade.");
+      setFlowStep("slots");
       return;
     }
 
@@ -467,7 +577,15 @@ function initLanding() {
     if (!slotEntry || slotEntry.status === "booked") {
       showToast("Horário indisponível. Escolha outro horário.");
       syncSlotsWithBookings();
+      bookingState.selectedSlot = null;
       renderTimeSlots();
+      setFlowStep("slots");
+      return;
+    }
+
+    if (!paymentMethod) {
+      showToast("Selecione uma forma de pagamento.");
+      setFlowStep("payment");
       return;
     }
 
@@ -480,6 +598,7 @@ function initLanding() {
       time: slot,
       date: todayISO,
       status: "Agendado",
+      paymentMethod,
     };
 
     bookingState.items.push(booking);
@@ -505,6 +624,7 @@ function initLanding() {
     bookingState.selectedSlot = null;
     form.reset();
     renderTimeSlots();
+    setFlowStep("slots");
 
     const confirmationMessage = customer
       ? `Agendamento confirmado para ${slot}. Consulte seu histórico na área do cliente.`
@@ -517,6 +637,9 @@ function initLanding() {
   renderPlans();
   renderTips();
   updateSelectedSlotInfo();
+  requestAnimationFrame(() => {
+    setFlowStep(currentFlowStep);
+  });
 }
 
 function initCliente() {
