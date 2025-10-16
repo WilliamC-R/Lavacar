@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lavacar • Autenticação do Cliente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="auth">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand__logo">Lavacar</span>
+        <span class="brand__subtitle">Acesso seguro para clientes</span>
+      </div>
+      <nav class="top-bar__nav">
+        <a class="nav-link" href="cliente.html">Portal do cliente</a>
+        <a class="nav-link" href="equipe.html">Área da equipe</a>
+      </nav>
+    </header>
+
+    <main class="page page--compact">
+      <section class="section auth" id="autenticacao">
+        <header class="section__header">
+          <span class="section__label">Autenticação</span>
+          <h1>Entre com CPF e senha de 4 dígitos</h1>
+          <p>
+            Valide seu acesso em segundos para visualizar planos ativos, pagamentos e
+            histórico de serviços concluídos.
+          </p>
+        </header>
+
+        <div class="auth__grid">
+          <article class="card login-card">
+            <header>
+              <span class="card__label">Já sou cliente</span>
+              <h2>Autenticar acesso</h2>
+            </header>
+            <form id="authLoginForm" class="login-form">
+              <div class="form-field">
+                <label for="authCpf">CPF</label>
+                <input
+                  id="authCpf"
+                  name="cpf"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="000.000.000-00"
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <label for="authPassword">Senha (4 dígitos)</label>
+                <input
+                  id="authPassword"
+                  name="password"
+                  type="password"
+                  inputmode="numeric"
+                  pattern="[0-9]{4}"
+                  maxlength="4"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-primary">Acessar minha conta</button>
+              <p class="login-help">Caso tenha esquecido, gere uma nova senha ao lado.</p>
+            </form>
+          </article>
+
+          <article class="card signup-card">
+            <header>
+              <span class="card__label">Novo por aqui?</span>
+              <h2>Cadastre-se em instantes</h2>
+            </header>
+            <form id="signupForm" class="signup-form">
+              <div class="form-field">
+                <label for="signupName">Nome completo</label>
+                <input id="signupName" name="name" type="text" autocomplete="name" required />
+              </div>
+              <div class="form-field">
+                <label for="signupCpf">CPF</label>
+                <input
+                  id="signupCpf"
+                  name="cpf"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="000.000.000-00"
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <label for="signupEmail">E-mail</label>
+                <input id="signupEmail" name="email" type="email" autocomplete="email" required />
+              </div>
+              <button type="submit" class="btn-secondary">Gerar senha de 4 dígitos</button>
+              <p class="login-help">
+                Após o cadastro, enviaremos automaticamente uma senha numérica para o seu e-mail.
+              </p>
+            </form>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Lavacar</strong>
+        <p>Excelência em estética automotiva de alto padrão.</p>
+      </div>
+      <div>
+        <span>Atendimento</span>
+        <p>Segunda a sábado, das 8h às 18h.</p>
+      </div>
+      <div>
+        <span>Precisa de ajuda?</span>
+        <p>Contato via WhatsApp (48) 99999-0000</p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

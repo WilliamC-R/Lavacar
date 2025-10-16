@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lavacar • Painel da Equipe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="equipe">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand__logo">Lavacar</span>
+        <span class="brand__subtitle">Operações em tempo real</span>
+      </div>
+      <nav class="top-bar__nav">
+        <a class="nav-link" href="autenticacao.html">Área do cliente</a>
+        <a class="nav-link is-active" href="equipe.html">Área da equipe</a>
+        <a class="cta" href="#tarefas">Nova tarefa</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="section" id="agendamentos-equipe">
+        <header class="section__header">
+          <span class="section__label">Painel de agendamentos</span>
+          <h1>Horários confirmados e andamento dos serviços</h1>
+        </header>
+        <div class="card table-card">
+          <table id="teamAppointments">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Placa</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="recados-equipe">
+        <header class="section__header">
+          <span class="section__label">Recados</span>
+          <h2>Atualizações rápidas para todo o time</h2>
+        </header>
+        <div class="card bulletin" id="teamNotes"></div>
+      </section>
+
+      <section class="section" id="estoque">
+        <header class="section__header">
+          <span class="section__label">Controle de estoque</span>
+          <h2>Materiais críticos com alerta instantâneo</h2>
+        </header>
+        <div class="card table-card">
+          <table id="inventoryTable">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantidade</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="financas">
+        <header class="section__header">
+          <span class="section__label">Finanças</span>
+          <h2>Confirme recebimentos e organize o caixa</h2>
+        </header>
+        <div class="card table-card">
+          <table id="teamPayments">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Lavacar</strong>
+        <p>Suporte operacional dedicado 7 dias por semana.</p>
+      </div>
+      <div>
+        <span>Contato interno</span>
+        <p>Ramal 301 • equipe@lavacar.com</p>
+      </div>
+      <div>
+        <span>Gestão</span>
+        <p>Use este painel para registrar evidências e checklists.</p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
