@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lavacar • Portal do Cliente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="cliente">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand__logo">Lavacar</span>
+        <span class="brand__subtitle">Acompanhe seus planos e cobranças</span>
+      </div>
+      <nav class="top-bar__nav">
+        <a class="nav-link" href="index.html">Agendamento rápido</a>
+        <a class="nav-link" href="autenticacao.html">Autenticação</a>
+        <a class="nav-link" href="equipe.html">Área da equipe</a>
+      </nav>
+    </header>
+
+    <main class="page page--compact">
+      <section class="section access" id="acesso">
+        <header class="section__header">
+          <span class="section__label">Portal do cliente</span>
+          <h1>Acompanhe planos ativos e histórico</h1>
+          <p>
+            Após autenticar com CPF e senha de 4 dígitos, visualize todos os planos e
+            pagamentos associados à sua conta.
+          </p>
+        </header>
+        <div class="access__grid">
+          <article class="card login-card" id="loginReminderCard">
+            <header>
+              <span class="card__label">Acesso protegido</span>
+              <h2>Faça a autenticação rápida</h2>
+            </header>
+            <p>
+              Clique abaixo para informar seu CPF e a senha numérica enviada para o seu
+              e-mail. Você também pode gerar uma senha de 4 dígitos em poucos segundos.
+            </p>
+            <a class="btn-primary" href="autenticacao.html">Ir para autenticação</a>
+            <p class="login-help">Não possui cadastro? Solicite na tela de autenticação.</p>
+          </article>
+
+          <article class="card profile-card" id="profileCard" hidden>
+            <header>
+              <span class="card__label">Cliente autenticado</span>
+              <h2 id="profileName"></h2>
+            </header>
+            <dl class="profile-card__info">
+              <div>
+                <dt>CPF</dt>
+                <dd id="profileCpf"></dd>
+              </div>
+              <div>
+                <dt>Planos ativos</dt>
+                <dd id="profilePlans">0</dd>
+              </div>
+              <div>
+                <dt>Último agendamento</dt>
+                <dd id="profileLastBooking">—</dd>
+              </div>
+            </dl>
+            <button type="button" class="btn-secondary" id="logoutButton">Sair</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="section portal" id="painel-cliente">
+        <header class="section__header">
+          <span class="section__label">Painel pessoal</span>
+          <h2>Planos ativos e histórico de agendamentos</h2>
+          <p>Tudo em um único lugar após autenticação com CPF e senha de 4 dígitos.</p>
+        </header>
+        <div class="portal__grid">
+          <article class="card active-plans-card" id="activePlansCard">
+            <header>
+              <span class="card__label">Assinaturas</span>
+              <h3>Planos vigentes</h3>
+            </header>
+            <ul id="activePlansList" class="active-plans"></ul>
+          </article>
+
+          <article class="card table-card" id="bookingsCard">
+            <header>
+              <span class="card__label">Histórico</span>
+              <h3>Agendamentos confirmados</h3>
+            </header>
+            <table id="customerBookings">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Horário</th>
+                  <th>Serviço</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Lavacar</strong>
+        <p>Excelência em estética automotiva de alto padrão.</p>
+      </div>
+      <div>
+        <span>Atendimento</span>
+        <p>Segunda a sábado, das 8h às 18h.</p>
+      </div>
+      <div>
+        <span>Precisa de ajuda?</span>
+        <p>Contato via WhatsApp (48) 99999-0000</p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
